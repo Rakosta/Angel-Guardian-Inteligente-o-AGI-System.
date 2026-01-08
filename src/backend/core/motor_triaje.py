@@ -1,19 +1,25 @@
+from ia.inferencia.predictor_riesgo import predecir_riesgo_fatiga
+
 def clasificar_evento(data: dict) -> str:
     """
-    Clasifica la gravedad de un evento basado en signos vitales y tipo de alerta.
+    Clasifica la gravedad de un evento basado en signos vitales, tipo de alerta
+    y el predictor de riesgo de fatiga.
     """
 
     tipo = data.get("tipo")
     signos = data.get("signos_vitales", {})
 
-    # Reglas simples iniciales (luego se reemplazarán con IA real)
+    # Si es una caída, prioridad alta directa
     if tipo == "caida":
         return "alta"
 
-    if signos.get("pulso", 0) < 40 or signos.get("pulso", 0) > 160:
-        return "critica"
+    # Usar el predictor de riesgo de fatiga
+    resultado_ia = predecir_riesgo_fatiga(signos)
+    riesgo = resultado_ia.get("riesgo")
 
-    if signos.get("temperatura", 0) > 39:
+    if riesgo == "alto":
+        return "critica"
+    if riesgo == "medio":
         return "alta"
 
     return "normal"
